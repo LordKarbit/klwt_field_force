@@ -2647,9 +2647,240 @@ select {
     #0b1312;
 }
 
+.surveyor-workspace-hero {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid rgba(47, 208, 168, 0.18);
+  border-radius: 18px;
+  background:
+    linear-gradient(135deg, rgba(47, 208, 168, 0.14), transparent 56%),
+    rgba(255, 255, 255, 0.035);
+}
+
+.surveyor-workspace-kicker {
+  display: block;
+  color: #7df4d5 !important;
+  font-weight: 800 !important;
+  text-transform: uppercase;
+}
+
+.surveyor-workspace-title {
+  margin-top: 2px !important;
+  font-size: 1.45rem !important;
+  line-height: 1.08 !important;
+  font-weight: 950 !important;
+}
+
+.surveyor-workspace-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.surveyor-workspace-stat {
+  min-width: 0;
+  padding: 9px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.16);
+}
+
+.surveyor-workspace-stat .MuiTypography-root {
+  font-weight: 950;
+  line-height: 1;
+}
+
+.surveyor-workspace-stat span {
+  display: block;
+  margin-top: 3px;
+  overflow: hidden;
+  color: rgba(236, 246, 242, 0.64);
+  font-size: 0.68rem;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.surveyor-workspace-tabs {
+  min-height: 42px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+}
+
+.surveyor-workspace-tabs .MuiTab-root {
+  min-height: 42px;
+  font-weight: 900;
+}
+
+.visit-list-scroll {
+  display: grid;
+  gap: 10px;
+  max-height: 430px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0 3px 2px 0;
+  scrollbar-width: thin;
+}
+
+.visit-list-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.visit-list-scroll::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(47, 208, 168, 0.32);
+}
+
 .visit-card {
   padding: 12px;
   background: rgba(255, 255, 255, 0.035) !important;
+}
+
+.surveyor-visit-card {
+  position: relative;
+  overflow: hidden;
+  padding: 12px !important;
+  border-radius: 14px !important;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.045), transparent 52%),
+    rgba(255, 255, 255, 0.032) !important;
+}
+
+.surveyor-visit-card::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: rgba(47, 208, 168, 0.28);
+  opacity: 0;
+  transition: opacity 180ms ease;
+}
+
+.surveyor-visit-card:hover::before,
+.surveyor-visit-card:focus-visible::before,
+.surveyor-visit-card.active::before {
+  opacity: 1;
+}
+
+.visit-card-icon {
+  width: 42px !important;
+  height: 42px !important;
+  color: rgba(236, 246, 242, 0.78) !important;
+  background: rgba(0, 0, 0, 0.24) !important;
+  transition:
+    background 180ms ease,
+    color 180ms ease;
+}
+
+.visit-card-icon.gps-ready {
+  color: #05110f !important;
+  background: #2fd0a8 !important;
+}
+
+.visit-card-title {
+  min-width: 0;
+  font-size: 0.98rem !important;
+  font-weight: 950 !important;
+  line-height: 1.15 !important;
+}
+
+.visit-card-rank {
+  flex: 0 0 auto;
+  padding: 2px 6px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  color: rgba(236, 246, 242, 0.58);
+  font-size: 0.66rem;
+  font-weight: 900;
+}
+
+.visit-card-meta {
+  display: block;
+  margin-top: 3px !important;
+  max-width: 100%;
+}
+
+.visit-card-action {
+  display: inline-flex;
+  flex: 0 0 30px;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  overflow: hidden;
+  border: 1px solid rgba(47, 208, 168, 0.18);
+  border-radius: 999px;
+  color: #7df4d5;
+  background: rgba(47, 208, 168, 0.08);
+  transition:
+    width 180ms ease,
+    flex-basis 180ms ease,
+    background 180ms ease,
+    border-color 180ms ease;
+}
+
+.visit-card-action .MuiTypography-root {
+  max-width: 0;
+  opacity: 0;
+  overflow: hidden;
+  font-weight: 900;
+  white-space: nowrap;
+  transition:
+    max-width 180ms ease,
+    opacity 180ms ease;
+}
+
+.surveyor-visit-card:hover .visit-card-action,
+.surveyor-visit-card:focus-visible .visit-card-action,
+.surveyor-visit-card.active .visit-card-action {
+  flex-basis: 104px;
+  justify-content: space-between;
+  width: 104px;
+  padding: 0 8px;
+  border-color: rgba(47, 208, 168, 0.34);
+  background: rgba(47, 208, 168, 0.14);
+}
+
+.surveyor-visit-card:hover .visit-card-action .MuiTypography-root,
+.surveyor-visit-card:focus-visible .visit-card-action .MuiTypography-root,
+.surveyor-visit-card.active .visit-card-action .MuiTypography-root {
+  max-width: 72px;
+  opacity: 1;
+}
+
+.visit-card-extra {
+  display: grid;
+  gap: 4px;
+  max-height: 0;
+  overflow: hidden;
+  border-top: 1px solid transparent;
+  opacity: 0;
+  transition:
+    max-height 180ms ease,
+    opacity 180ms ease,
+    padding-top 180ms ease,
+    border-color 180ms ease;
+}
+
+.surveyor-visit-card:hover .visit-card-extra,
+.surveyor-visit-card:focus-within .visit-card-extra,
+.surveyor-visit-card.active .visit-card-extra {
+  max-height: 88px;
+  padding-top: 8px;
+  border-color: rgba(255, 255, 255, 0.08);
+  opacity: 1;
+}
+
+.visit-card-hint {
+  color: #7df4d5 !important;
+  font-weight: 800 !important;
+}
+
+.surveyor-state-card {
+  border-radius: 14px !important;
+  background:
+    linear-gradient(135deg, rgba(47, 208, 168, 0.08), transparent 60%),
+    rgba(255, 255, 255, 0.035) !important;
 }
 
 .visit-card[role='button'] {

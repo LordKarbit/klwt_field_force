@@ -8050,6 +8050,14 @@ function SurveyorPwaPage({
       'In Progress': { id: 'Sedang berjalan', en: 'In Progress', zh: '\u8fdb\u884c\u4e2d' },
       Revisit: { id: 'Kunjungan ulang', en: 'Revisit', zh: '\u590d\u8bbf' },
       'Visit & Location': { id: 'Kunjungan & Lokasi', en: 'Visit & Location', zh: '\u8bbf\u95ee\u548c\u4f4d\u7f6e' },
+      'Today route': { id: 'Rute hari ini', en: 'Today route', zh: '\u4eca\u65e5\u8def\u7ebf' },
+      'Active queue': { id: 'Antrean aktif', en: 'Active queue', zh: '\u6d3b\u52a8\u961f\u5217' },
+      'GPS targets': { id: 'Target GPS', en: 'GPS targets', zh: 'GPS \u76ee\u6807' },
+      'Open visit': { id: 'Buka kunjungan', en: 'Open visit', zh: '\u6253\u5f00\u62dc\u8bbf' },
+      'Need GPS': { id: 'Perlu GPS', en: 'Need GPS', zh: '\u9700\u8981 GPS' },
+      'GPS target': { id: 'GPS target', en: 'GPS target', zh: 'GPS \u76ee\u6807' },
+      'Tap to open survey': { id: 'Ketuk untuk membuka form survei', en: 'Tap to open survey', zh: '\u70b9\u51fb\u6253\u5f00\u8c03\u7814\u8868' },
+      'Location pending': { id: 'Lokasi target belum lengkap', en: 'Location pending', zh: '\u4f4d\u7f6e\u5f85\u5b8c\u6210' },
     };
     return copy[text]?.[language] ?? t(text);
   };
@@ -8132,6 +8140,22 @@ function SurveyorPwaPage({
   const activeSurveySteps = showFullSurveyFlow ? fullSurveySteps : exceptionSurveySteps;
   const reviewStepIndex = activeSurveySteps.length - 1;
   const submittedVisitIncomplete = submittedScore?.leadClassification === 'Visit Not Completed';
+  const planSummary = useMemo(() => {
+    const submitted = planItems.filter((item) => item.status === 'Submitted').length;
+    const gpsReady = planItems.filter((item) => Boolean(item.latitude && item.longitude)).length;
+    const revisit = planItems.filter((item) => /ulang|revisit/i.test(`${item.tag} ${item.area}`)).length;
+    return {
+      open: Math.max(planItems.length - submitted, 0),
+      submitted,
+      gpsReady,
+      revisit,
+    };
+  }, [planItems]);
+  const formatPlanLocation = (item: PlanItem) =>
+    [item.district || item.area, item.city].filter(Boolean).join(' / ') || item.area;
+  const formatPlanAddress = (item: PlanItem) =>
+    [item.addressDetail, item.village, item.district, item.city].filter(Boolean).join(', ');
+  const hasTargetGps = (item: PlanItem) => Boolean(item.latitude && item.longitude);
 
   useEffect(() => {
     setStep((current) => Math.min(current, reviewStepIndex));
@@ -9076,54 +9100,110 @@ function SurveyorPwaPage({
           </Stack>
         </Box>
         <Stack spacing={2} className="phone-content">
-          <Stack direction="row" alignItems="center" justifyContent="space-between">
-            <Box>
-              <Typography variant="caption" color="text.secondary">
-                {pwaText('Assigned Visits')}
-              </Typography>
-              <Typography variant="h6">{planItems.length || 0} kunjungan</Typography>
+          <Box className="surveyor-workspace-hero">
+            <Stack direction="row" alignItems="flex-start" justifyContent="space-between" gap={1.5}>
+              <Box minWidth={0}>
+                <Typography className="surveyor-workspace-kicker" variant="caption">
+                  {pwaText('Today route')}
+                </Typography>
+                <Typography className="surveyor-workspace-title" variant="h6">
+                  {planItems.length || 0} kunjungan
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  {planSummary.open} {pwaText('Active queue').toLowerCase()} / {planSummary.submitted} {pwaText('Submitted').toLowerCase()}
+                </Typography>
+              </Box>
+              <PolibeliLogo size={40} />
+            </Stack>
+            <Box className="surveyor-workspace-stats">
+              <Box className="surveyor-workspace-stat">
+                <Typography>{planSummary.open}</Typography>
+                <span>{pwaText('Active queue')}</span>
+              </Box>
+              <Box className="surveyor-workspace-stat">
+                <Typography>{planSummary.gpsReady}</Typography>
+                <span>{pwaText('GPS targets')}</span>
+              </Box>
+              <Box className="surveyor-workspace-stat">
+                <Typography>{planSummary.revisit}</Typography>
+                <span>{pwaText('Revisit')}</span>
+              </Box>
             </Box>
-            <PolibeliLogo size={40} />
-          </Stack>
-          <Tabs value={tab} onChange={(_, next) => setTab(next)} variant="fullWidth">
+          </Box>
+          <Tabs className="surveyor-workspace-tabs" value={tab} onChange={(_, next) => setTab(next)} variant="fullWidth">
             <Tab label={pwaText('Plan')} />
             <Tab label={pwaText('Draft')} />
             <Tab label={pwaText('History')} />
           </Tabs>
-          <Stack spacing={1.2}>
+          <Box className="visit-list-scroll">
             {tab === 0 &&
-              planItems.map((item) => (
-                <Paper
-                  key={item.name}
-                  role="button"
-                  tabIndex={0}
-                  className={`visit-card ${storeName === item.name ? 'active' : ''}`}
-                  onClick={() => selectStoreForSurvey(item.name)}
-                  onKeyDown={(event) => {
-                    if (event.key === 'Enter' || event.key === ' ') {
-                      event.preventDefault();
-                      selectStoreForSurvey(item.name);
-                    }
-                  }}
-                >
-                  <Stack direction="row" spacing={1.2} alignItems="center">
-                    <Avatar variant="rounded" sx={{ bgcolor: storeName === item.name ? 'primary.main' : 'background.paper' }}>
-                      <StorefrontRoundedIcon />
-                    </Avatar>
-                    <Box flex={1} minWidth={0}>
-                      <Typography fontWeight={900} noWrap data-no-i18n>
-                        {item.name}
-                      </Typography>
-                      <Typography variant="caption" color="text.secondary">
-                        {item.area} - {pwaText(item.tag)}
-                      </Typography>
-                    </Box>
-                    <Chip size="small" label={pwaText(item.status)} color={storeName === item.name ? 'primary' : item.status === 'Submitted' ? 'success' : 'default'} />
-                  </Stack>
-                </Paper>
-              ))}
+              planItems.map((item, index) => {
+                const selected = storeName === item.name;
+                const gpsReady = hasTargetGps(item);
+                const addressPreview = formatPlanAddress(item);
+                return (
+                  <Paper
+                    key={item.name}
+                    role="button"
+                    tabIndex={0}
+                    className={`visit-card surveyor-visit-card ${selected ? 'active' : ''}`}
+                    onClick={() => selectStoreForSurvey(item.name)}
+                    onKeyDown={(event) => {
+                      if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault();
+                        selectStoreForSurvey(item.name);
+                      }
+                    }}
+                  >
+                    <Stack spacing={1}>
+                      <Stack direction="row" spacing={1.1} alignItems="center">
+                        <Avatar variant="rounded" className={`visit-card-icon ${gpsReady ? 'gps-ready' : 'gps-missing'}`}>
+                          <StorefrontRoundedIcon fontSize="small" />
+                        </Avatar>
+                        <Box flex={1} minWidth={0}>
+                          <Stack direction="row" spacing={0.8} alignItems="center" minWidth={0}>
+                            <Typography className="visit-card-title" noWrap data-no-i18n>
+                              {item.name}
+                            </Typography>
+                            <span className="visit-card-rank">#{index + 1}</span>
+                          </Stack>
+                          <Typography className="visit-card-meta" variant="caption" color="text.secondary" noWrap>
+                            {formatPlanLocation(item)} - {pwaText(item.tag)}
+                          </Typography>
+                        </Box>
+                        <Box className="visit-card-action">
+                          <Typography variant="caption">{pwaText('Open visit')}</Typography>
+                          <KeyboardArrowRightRoundedIcon fontSize="small" />
+                        </Box>
+                      </Stack>
+                      <Stack direction="row" spacing={0.7} flexWrap="wrap" useFlexGap>
+                        <Chip
+                          size="small"
+                          label={gpsReady ? pwaText('GPS target') : pwaText('Need GPS')}
+                          color={gpsReady ? 'success' : 'default'}
+                          variant={gpsReady ? 'filled' : 'outlined'}
+                        />
+                        <Chip
+                          size="small"
+                          label={pwaText(item.status)}
+                          color={selected ? 'primary' : item.status === 'Submitted' ? 'success' : 'default'}
+                          variant={selected ? 'filled' : 'outlined'}
+                        />
+                      </Stack>
+                      <Box className="visit-card-extra">
+                        <Typography variant="caption" color="text.secondary">
+                          {addressPreview || pwaText('Location pending')}
+                        </Typography>
+                        <Typography variant="caption" className="visit-card-hint">
+                          {pwaText('Tap to open survey')}
+                        </Typography>
+                      </Box>
+                    </Stack>
+                  </Paper>
+                );
+              })}
             {tab === 1 && (
-              <Paper className="visit-card">
+              <Paper className="visit-card surveyor-state-card">
                 <Typography fontWeight={900}>{draftSavedAt ? 'Draft tersedia' : 'Belum ada draft tersimpan'}</Typography>
                 <Typography variant="body2" color="text.secondary">
                   {draftSavedAt ? `${storeName} disimpan pada ${draftSavedAt}` : 'Tekan Save Draft di form survey untuk menyimpan pekerjaan sementara.'}
@@ -9137,7 +9217,7 @@ function SurveyorPwaPage({
               <Stack spacing={1}>
                 {historyItems.length ? (
                   historyItems.slice(0, 5).map((item) => (
-                    <Paper key={item.id} className="visit-card">
+                    <Paper key={item.id} className="visit-card surveyor-state-card">
                       <Typography fontWeight={900} data-no-i18n>
                         {item.storeName}
                       </Typography>
@@ -9147,7 +9227,7 @@ function SurveyorPwaPage({
                     </Paper>
                   ))
                 ) : (
-                  <Paper className="visit-card">
+                  <Paper className="visit-card surveyor-state-card">
                     <Typography fontWeight={900}>History submit hari ini</Typography>
                     <Typography variant="body2" color="text.secondary">
                       {lastSubmittedStore ? `${lastSubmittedStore} sudah masuk queue verifikasi.` : 'Belum ada survey yang disubmit pada sesi ini.'}
@@ -9156,7 +9236,7 @@ function SurveyorPwaPage({
                 )}
               </Stack>
             )}
-          </Stack>
+          </Box>
           <Button variant="contained" size="large" startIcon={<AddLocationAltRoundedIcon />} onClick={() => setUnplannedOpen(true)}>
             {pwaText('Add Manual Visit')}
           </Button>
