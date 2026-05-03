@@ -1,0 +1,66 @@
+{
+  "name": "klwt-field-force-frontend",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently -k -n api,web -c green,cyan \"npm run dev:api\" \"npm run dev:web\"",
+    "dev:web": "vite --host 127.0.0.1 --port 3010 --strictPort",
+    "dev:api": "tsx src/server/index.ts",
+    "build": "tsc -b && vite build",
+    "test": "jest --runInBand",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage --runInBand",
+    "preview": "vite preview --host 127.0.0.1",
+    "db:push": "drizzle-kit push",
+    "locations:import:kml": "node scripts/import-location-boundaries.mjs",
+    "demo:reseed:dry-run": "node scripts/reseed-realistic-demo-data.mjs --dry-run",
+    "demo:reseed:apply": "node scripts/reseed-realistic-demo-data.mjs --apply"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@mui/icons-material": "^7.3.10",
+    "@mui/material": "^7.3.10",
+    "bcryptjs": "^3.0.3",
+    "better-auth": "^1.6.9",
+    "better-sqlite3": "^12.9.0",
+    "cors": "^2.8.6",
+    "drizzle-orm": "^0.45.2",
+    "express": "^4.22.1",
+    "nanoid": "^5.1.9",
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5",
+    "web-push": "^3.6.7",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@swc/core": "^1.15.32",
+    "@swc/jest": "^0.2.39",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/jest": "^30.0.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@types/supertest": "^7.2.0",
+    "@types/web-push": "^3.6.4",
+    "@vitejs/plugin-react": "^6.0.1",
+    "concurrently": "^9.2.1",
+    "drizzle-kit": "^0.31.10",
+    "jest": "^30.3.0",
+    "jest-environment-jsdom": "^30.3.0",
+    "supertest": "^7.2.2",
+    "tsx": "^4.21.0",
+    "typescript": "^6.0.3",
+    "vite": "^8.0.10"
+  },
+  "overrides": {
+    "@esbuild-kit/core-utils": {
+      "esbuild": "^0.25.12"
+    }
+  }
+}
