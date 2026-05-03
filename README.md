@@ -286,6 +286,30 @@ The build output is written to `dist/` and is ignored by git.
 
 ## Troubleshooting
 
+### Cloudflare quick tunnel can open the page but cannot login
+
+Run the app normally first:
+
+```powershell
+npm run dev
+```
+
+Then expose the Vite web server:
+
+```powershell
+cloudflared tunnel --url http://127.0.0.1:3010
+```
+
+The landing page is served by Vite on port `3010`, while login is handled by the API on port `3005` through the Vite `/api` proxy. In development, the backend accepts local origins and `https://*.trycloudflare.com` origins so the random Cloudflare quick-tunnel URL can call `/api/login`.
+
+For a fixed production domain, configure explicit values instead of relying on the development tunnel allowance:
+
+```text
+AUTH_BASE_URL=https://your-api-domain.example.com
+AUTH_TRUSTED_ORIGINS=https://your-app-domain.example.com
+CORS_ORIGINS=https://your-app-domain.example.com
+```
+
 ### Port 3005 already in use
 
 If `npm run dev` fails with `EADDRINUSE` for `127.0.0.1:3005`, stop the process using that port:

@@ -17,6 +17,7 @@ if (process.env.SEED_DEMO_DATA === 'true' || process.env.NODE_ENV !== 'productio
 const app = express();
 const api = express.Router();
 const port = Number(process.env.API_PORT ?? 3005);
+const isProduction = process.env.NODE_ENV === 'production';
 const allowedOrigins = new Set(
   (process.env.CORS_ORIGINS ?? 'http://127.0.0.1:3010,http://localhost:3010,http://127.0.0.1:5173,http://localhost:5173')
     .split(',')
@@ -24,10 +25,20 @@ const allowedOrigins = new Set(
     .filter(Boolean),
 );
 
+function isAllowedDevTunnelOrigin(origin: string) {
+  if (isProduction) return false;
+  try {
+    const url = new URL(origin);
+    return url.protocol === 'https:' && url.hostname.endsWith('.trycloudflare.com');
+  } catch {
+    return false;
+  }
+}
+
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin || allowedOrigins.has(origin)) return callback(null, true);
+      if (!origin || allowedOrigins.has(origin) || isAllowedDevTunnelOrigin(origin)) return callback(null, true);
       return callback(new Error('Origin is not allowed by CORS'));
     },
     credentials: true,
